@@ -1,0 +1,6 @@
+[submodule "references/typ"]
+	path = references/typ
+	url = https://github.com/peterhellberg/typ
+[submodule "references/wasm-minimal-protocol"]
+	path = references/wasm-minimal-protocol
+	url = https://github.com/typst-community/wasm-minimal-protocol
