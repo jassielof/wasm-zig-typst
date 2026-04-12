@@ -1,0 +1,81 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    name: Build and generate docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Zig
+        uses: jassielof/setup-zig@v1
+
+      - name: Formatting
+        run: zig fmt .
+
+      - name: Build
+        run: zig build --summary all
+
+      - name: Generate documentation
+        run: zig build docs --summary all
+
+      - name: Upload page artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: zig-out/docs
+
+  tests:
+    name: Test library and examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Zig
+        uses: jassielof/setup-zig@v1
+
+      - name: Run test suite
+        run: zig build tests --summary all
+
+      - name: Build example's WASM
+        working-directory: example
+        run: zig build --summary all
+
+      - name: Set up Typst
+        uses: typst-community/setup-typst@v5
+
+      - name: Run Typst tests
+        working-directory: example
+        run: |
+
+      - name: Upload test artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: |
+            zig-out/bin/hello.wasm
+            *.pdf
+
+  pages:
+    name: Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

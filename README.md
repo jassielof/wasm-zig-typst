@@ -1,0 +1,1 @@
+# Typst WASM Minimal Protocol

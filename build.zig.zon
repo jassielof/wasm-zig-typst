@@ -1,0 +1,13 @@
+.{
+    .name = .typst_wasm_minimal_protocol,
+    .version = "0.1.0",
+    .fingerprint = 0x1313696cd4a6e300,
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "LICENSE.txt",
+        "README.md",
+    },
+}
