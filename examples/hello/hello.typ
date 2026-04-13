@@ -1,5 +1,3 @@
-//! Minimum supported Typst version: 0.8.0
-
 #set page(height: auto)
 
 == WebAssembly plugin (Zig + typst_wasm_minimal_protocol)

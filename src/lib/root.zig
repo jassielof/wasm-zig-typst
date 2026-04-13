@@ -5,12 +5,9 @@
 //! - lets the plugin read the concatenated argument bytes with [`write`], then
 //! - send a result (and exit status) with [`send`] or the [`str`]/[`err`] helpers.
 //!
-//! The two imports the host provides are declared at the bottom of this file
-//! (`wasm_minimal_protocol_*`). They must stay available when linking for
-//! `wasm32-freestanding` (or WASI plus stubbing—see upstream `wasi-stub`).
+//! The two imports the host provides are declared at the bottom of this file (`wasm_minimal_protocol_*`). They must stay available when linking for `wasm32-freestanding` (or WASI plus stubbing—see upstream `wasi-stub`).
 //!
-//! For native **unit tests**, use [`parseFromBytes`] instead of [`parse`], because
-//! [`parse`] calls [`write`], which requires the Typst runtime.
+//! For native **unit tests**, use [`parseFromBytes`] instead of [`parse`], because [`parse`] calls [`write`], which requires the Typst runtime.
 
 const std = @import("std");
 
@@ -19,8 +16,7 @@ pub const ok = str;
 
 /// Send a UTF-8 payload to the host and return exit code `0` (success).
 ///
-/// The host typically exposes the bytes as the plugin call’s return value on
-/// the Typst side (`str(p.my_func(...))`).
+/// The host typically exposes the bytes as the plugin call’s return value on the Typst side (`str(p.my_func(...))`).
 pub fn str(msg: []const u8) i32 {
     return send(msg, 0);
 }
@@ -32,7 +28,7 @@ pub fn strf(comptime format: []const u8, args: anytype) i32 {
     const msg = allocPrint(format, args) catch {
         return err("strf: failed fmt");
     };
-    defer hpa.free(msg);
+    defer std.heap.page_allocator.free(msg);
 
     return send(msg, 0);
 }
@@ -49,17 +45,14 @@ pub fn errf(comptime format: []const u8, args: anytype) i32 {
     const msg = allocPrint(format, args) catch {
         return err("errf: failed fmt");
     };
-    defer hpa.free(msg);
+    defer std.heap.page_allocator.free(msg);
 
     return send(msg, 1);
 }
 
-/// Read plugin arguments from the host, split them using `ns`, and parse each
-/// segment as `T`.
+/// Read plugin arguments from the host, split them using `ns`, and parse each segment as `T`.
 ///
-/// `ns[i]` is the byte length of the `i`th argument as passed from Typst. Their
-/// sum must match the buffer size the host writes. Supported `T` are integers
-/// and floats (`std.fmt.parseInt` / `parseFloat`).
+/// `ns[i]` is the byte length of the `i`th argument as passed from Typst. Their sum must match the buffer size the host writes. Supported `T` are integers and floats (`std.fmt.parseInt` / `parseFloat`).
 ///
 /// **Note:** Calls [`write`]; only use this inside real WASM, not in native tests.
 pub fn parse(comptime C: usize, T: type, ns: [C]usize) ![C]T {
@@ -79,8 +72,7 @@ pub fn parse(comptime C: usize, T: type, ns: [C]usize) ![C]T {
 
 /// Split `args` into `C` segments with lengths `ns`, then parse each as `T`.
 ///
-/// Use this in tests or whenever you already hold the argument bytes. For live
-/// plugins, [`parse`] is usually more convenient.
+/// Use this in tests or whenever you already hold the argument bytes. For live plugins, [`parse`] is usually more convenient.
 pub fn parseFromBytes(comptime C: usize, T: type, args: []const u8, ns: [C]usize) ![C]T {
     if (C == 0) {
         if (args.len != 0) return error.LengthMismatch;
@@ -115,25 +107,20 @@ pub fn write(ptr: [*]u8) void {
     wasm_minimal_protocol_write_args_to_buffer(ptr);
 }
 
-// ===
-// Heap page allocator
-
-const hpa = std.heap.page_allocator;
-
 /// Allocate `n` elements of `T` with the page allocator; release with [`free`].
 pub fn alloc(comptime T: type, n: usize) ![]T {
-    return hpa.alloc(T, n);
+    return std.heap.page_allocator.alloc(T, n);
 }
 
 /// Format into a newly allocated `[]u8` (page allocator). Prefer [`strf`] / [`errf`]
 /// when sending straight to the host.
 pub fn allocPrint(comptime format: []const u8, args: anytype) ![]u8 {
-    return std.fmt.allocPrint(hpa, format, args);
+    return std.fmt.allocPrint(std.heap.page_allocator, format, args);
 }
 
 /// Free memory allocated with [`alloc`] or [`allocPrint`].
 pub fn free(memory: anytype) void {
-    hpa.free(memory);
+    std.heap.page_allocator.free(memory);
 }
 
 // Protocol imports (provided by Typst at load time)
@@ -149,8 +136,13 @@ fn parseValue(comptime T: type, bytes: []const u8) !T {
     };
 }
 
-test "parseFromBytes: three integer segments" {
-    const values = try parseFromBytes(3, u32, "102030", .{ 2, 2, 2 });
+test parseFromBytes {
+    const values = try parseFromBytes(
+        3,
+        u32,
+        "102030",
+        .{ 2, 2, 2 },
+    );
 
     try std.testing.expectEqual([3]u32{ 10, 20, 30 }, values);
 }

@@ -1,7 +1,7 @@
 .{
-    .name = .typst_wasm_minimal_protocol,
+    .name = .wasm_minimal_protocol,
     .version = "0.1.0",
-    .fingerprint = 0x1313696cd4a6e300,
+    .fingerprint = 0x2f32a71a7a384443,
     .dependencies = .{},
     .paths = .{
         "build.zig",
