@@ -4,14 +4,14 @@ pub fn build(b: *std.Build) void {
     const mod_name = "typst_wasm_minimal_protocol";
 
     const target = b.standardTargetOptions(.{});
-    const optimze = b.standardOptimizeOption(.{});
+    const optimize = b.standardOptimizeOption(.{});
 
     const lib_mod = b.addModule(
         mod_name,
         .{
             .root_source_file = b.path("src/lib/root.zig"),
             .target = target,
-            .optimize = optimze,
+            .optimize = optimize,
         },
     );
 
@@ -44,7 +44,13 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .root_source_file = b.path("tests/suite.zig"),
             .target = target,
-            .optimize = optimze,
+            .optimize = optimize,
+            .imports = &.{
+                .{
+                    .name = "twmp",
+                    .module = lib_mod,
+                },
+            },
         }),
     });
 
