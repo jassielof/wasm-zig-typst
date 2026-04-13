@@ -57,6 +57,7 @@ jobs:
         uses: go-task/setup-task@v2
 
       - name: Run examples
+        working-directory: examples
         run: task
 
       - name: Upload test artifact
