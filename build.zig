@@ -37,7 +37,8 @@ pub fn build(b: *std.Build) void {
         .name = "Unit Tests",
     });
 
-    tests_step.dependOn(&unit_tests.step);
+    const run_unit_tests = b.addRunArtifact(unit_tests);
+    tests_step.dependOn(&run_unit_tests.step);
 
     const integration_tests = b.addTest(.{
         .name = "Integration Tests",
@@ -54,5 +55,6 @@ pub fn build(b: *std.Build) void {
         }),
     });
 
-    tests_step.dependOn(&integration_tests.step);
+    const run_integration_tests = b.addRunArtifact(integration_tests);
+    tests_step.dependOn(&run_integration_tests.step);
 }
