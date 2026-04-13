@@ -1,5 +1,4 @@
-#set page(width: 10cm, height: 10cm)
-#set text(font: "Inter")
+#set page(height: auto)
 
 == A WebAssembly plugin for Typst
 
