@@ -29,4 +29,24 @@ pub fn build(b: *std.Build) void {
     });
 
     docs_step.dependOn(&docs.step);
+
+    const tests_step = b.step("tests", "Run the test suite");
+
+    const unit_tests = b.addTest(.{
+        .root_module = lib_mod,
+        .name = "Unit Tests",
+    });
+
+    tests_step.dependOn(&unit_tests.step);
+
+    const integration_tests = b.addTest(.{
+        .name = "Integration Tests",
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("tests/suite.zig"),
+            .target = target,
+            .optimize = optimze,
+        }),
+    });
+
+    tests_step.dependOn(&integration_tests.step);
 }
