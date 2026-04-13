@@ -4,7 +4,7 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{
         .default_target = .{
             .cpu_arch = .wasm32,
-            .os_tag = .freestanding, // or wasi
+            .os_tag = .freestanding,
         },
     });
 

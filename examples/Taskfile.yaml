@@ -1,0 +1,11 @@
+version: 3
+
+tasks:
+  default:
+    deps:
+      - hello
+  hello:
+    dir: hello
+    cmds:
+      - zig build --summary all
+      - typst compile hello.typ

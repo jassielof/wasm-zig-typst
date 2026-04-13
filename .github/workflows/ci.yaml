@@ -37,7 +37,7 @@ jobs:
           path: zig-out/docs
 
   tests:
-    name: Test library and example
+    name: Test library and examples
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -50,23 +50,20 @@ jobs:
       - name: Run test suite
         run: zig build tests --summary all
 
-      - name: Build example's WASM
-        working-directory: example
-        run: zig build --summary all
-
       - name: Set up Typst
         uses: typst-community/setup-typst@v5
 
-      - name: Run Typst test
-        working-directory: example
-        run: typst compile hello.typ
+      - name: Set up Task
+        uses: go-task/setup-task@v2
+
+      - name: Run examples
+        run: task
+
       - name: Upload test artifact
         uses: actions/upload-artifact@v7
         with:
           name: test-results
-          path: |
-            zig-out/bin/hello.wasm
-            *.pdf
+          path: "**/*.pdf"
 
   pages:
     name: Deploy to GitHub Pages

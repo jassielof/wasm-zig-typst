@@ -4,14 +4,14 @@
     .fingerprint = 0xc0a88d18f6217e5f,
     .dependencies = .{
         .typst_wasm_minimal_protocol = .{
-            .path = "./../", // seems to be an issue if it's only "../"
+            .path = "../../",
         },
     },
     .paths = .{
         "build.zig",
         "build.zig.zon",
-        "src",
-        "LICENSE.txt",
+        "hello.zig",
+        "hello.typ",
         "README.md",
     },
 }
