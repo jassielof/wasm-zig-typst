@@ -5,6 +5,7 @@ tasks:
     deps:
       - hello
   hello:
+    desc: Basic hello example.
     dir: hello
     cmds:
       - zig build --summary all
