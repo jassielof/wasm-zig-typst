@@ -10,13 +10,7 @@ This package is `wasm_minimal_protocol`, and exposes a single module with the sa
 
 ### Examples
 
-- [examples/hello](examples/hello/) — build `hello.wasm`, run `typst compile hello.typ`
-
-```sh
-cd examples/hello
-zig build
-typst compile hello.typ
-```
+You can run the examples using Taskfile.
 
 ## Credits
 
