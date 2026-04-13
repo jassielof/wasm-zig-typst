@@ -5,7 +5,7 @@
 //! - lets the plugin read the concatenated argument bytes with [`write`], then
 //! - send a result (and exit status) with [`send`] or the [`str`]/[`err`] helpers.
 //!
-//! The two imports the host provides are declared at the bottom of this file (`wasm_minimal_protocol_*`). They must stay available when linking for `wasm32-freestanding` (or WASI plus stubbing—see upstream `wasi-stub`).
+//! The two imports the host provides are declared at the bottom of this file (`wasm_minimal_protocol_*`). They must stay available when linking for `wasm32-freestanding` (or WASI plus stubbing, *see upstream `wasi-stub`*).
 //!
 //! For native **unit tests**, use [`parseFromBytes`] instead of [`parse`], because [`parse`] calls [`write`], which requires the Typst runtime.
 
@@ -95,6 +95,17 @@ pub fn parseFromBytes(comptime C: usize, T: type, args: []const u8, ns: [C]usize
     return result;
 }
 
+test parseFromBytes {
+    const values = try parseFromBytes(
+        3,
+        u32,
+        "102030",
+        .{ 2, 2, 2 },
+    );
+
+    try std.testing.expectEqual([3]u32{ 10, 20, 30 }, values);
+}
+
 /// Send `msg` to the host, then return `exit_code` (`0` = ok, non-zero = err).
 pub fn send(msg: []const u8, exit_code: i32) i32 {
     wasm_minimal_protocol_send_result_to_host(msg.ptr, msg.len);
@@ -112,8 +123,7 @@ pub fn alloc(comptime T: type, n: usize) ![]T {
     return std.heap.page_allocator.alloc(T, n);
 }
 
-/// Format into a newly allocated `[]u8` (page allocator). Prefer [`strf`] / [`errf`]
-/// when sending straight to the host.
+/// Format into a newly allocated `[]u8` (page allocator). Prefer [`strf`] / [`errf`] when sending straight to the host.
 pub fn allocPrint(comptime format: []const u8, args: anytype) ![]u8 {
     return std.fmt.allocPrint(std.heap.page_allocator, format, args);
 }
@@ -134,17 +144,6 @@ fn parseValue(comptime T: type, bytes: []const u8) !T {
         .float => try std.fmt.parseFloat(T, bytes),
         else => @compileError("Cannot parse this type: " ++ @typeName(T)),
     };
-}
-
-test parseFromBytes {
-    const values = try parseFromBytes(
-        3,
-        u32,
-        "102030",
-        .{ 2, 2, 2 },
-    );
-
-    try std.testing.expectEqual([3]u32{ 10, 20, 30 }, values);
 }
 
 test "parseFromBytes: floats" {
