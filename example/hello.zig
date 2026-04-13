@@ -1,4 +1,3 @@
-const std = @import("std");
 const twmp = @import("twmp");
 
 export fn hello() i32 {
