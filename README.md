@@ -1,4 +1,4 @@
-# typst_wasm_minimal_protocol (Zig)
+# WASM Minimal Protocol for Typst in Zig
 
 Small Zig module for Typst plugins.
 
