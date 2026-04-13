@@ -8,7 +8,7 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    const optimze = b.standardOptimizeOption(.{});
+    const optimize = b.standardOptimizeOption(.{});
 
     const twmp_name = "typst_wasm_minimal_protocol";
 
@@ -19,7 +19,7 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .root_source_file = b.path("hello.zig"),
             .target = target,
-            .optimize = optimze,
+            .optimize = optimize,
             .imports = &.{
                 .{
                     .name = "twmp",
