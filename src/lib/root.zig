@@ -79,6 +79,12 @@ pub fn parseFromBytes(comptime C: usize, T: type, args: []const u8, ns: [C]usize
         return .{};
     }
 
+    var total_len: usize = 0;
+    for (ns) |segment_len| {
+        total_len = std.math.add(usize, total_len, segment_len) catch return error.LengthMismatch;
+    }
+    if (total_len != args.len) return error.LengthMismatch;
+
     var result: [C]T = undefined;
     var start: usize = 0;
 
